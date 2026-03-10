@@ -118,14 +118,6 @@ export default function Admin() {
   const [search, setSearch] = useState('')
   const [expanded, setExpanded] = useState<string | null>(null)
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (!data.session) navigate('/admin/login')
-    })
-
-    fetchCadastros()
-  }, [])
-
   async function fetchCadastros() {
     setLoading(true)
     const { data, error } = await supabase
@@ -137,6 +129,16 @@ export default function Admin() {
     setCadastros(data ?? [])
     setLoading(false)
   }
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (!data.session) {
+        navigate('/admin/login')
+      } else {
+        fetchCadastros()
+      }
+    })
+  }, [navigate])
 
   async function handleSignOut() {
     await signOut()
