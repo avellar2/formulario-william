@@ -219,6 +219,16 @@ export default function Admin() {
     navigate('/admin/login')
   }
 
+  function handleExportJson() {
+    const blob = new Blob([JSON.stringify(cadastros, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `cadastros_${new Date().toISOString().slice(0, 10)}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   const filtered = cadastros.filter((c) =>
     `${c.menor_nome} ${c.menor_sobrenome}`.toLowerCase().includes(search.toLowerCase())
   )
@@ -239,6 +249,16 @@ export default function Admin() {
               <p className="text-xs text-gray-400">{cadastros.length} registro{cadastros.length !== 1 ? 's' : ''}</p>
             </div>
           </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleExportJson}
+              className="flex items-center gap-2 text-sm text-gray-500 hover:text-blue-600 transition-colors font-medium"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Exportar JSON
+            </button>
           <button
             onClick={handleSignOut}
             className="flex items-center gap-2 text-sm text-gray-500 hover:text-red-500 transition-colors font-medium"
@@ -248,6 +268,7 @@ export default function Admin() {
             </svg>
             Sair
           </button>
+          </div>
         </div>
       </header>
 
