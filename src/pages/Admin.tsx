@@ -18,6 +18,7 @@ interface Cadastro {
   pai_telefone: string | null
   pai_email: string | null
   pai_data_nascimento: string | null
+  pai_cep: string | null
   pai_bairro: string | null
   pai_cidade: string | null
   tem_mae: boolean
@@ -26,6 +27,7 @@ interface Cadastro {
   mae_telefone: string | null
   mae_email: string | null
   mae_data_nascimento: string | null
+  mae_cep: string | null
   mae_bairro: string | null
   mae_cidade: string | null
 }
@@ -50,7 +52,55 @@ function Badge({ present, label }: { present: boolean; label: string }) {
   )
 }
 
+const BIGDATA_URL = 'https://bigdata.app.br/77/meuscadastros_add.php?codigo=MU7NWK'
+
+function buildBigdataUrl(params: Record<string, string | null>): string {
+  const url = new URL(BIGDATA_URL)
+  Object.entries(params).forEach(([key, value]) => {
+    if (value) url.searchParams.set(key, value)
+  })
+  return url.toString()
+}
+
+function BigdataButton({ url }: { url: string }) {
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="mt-3 flex items-center justify-center gap-2 w-full py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-colors"
+    >
+      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+      </svg>
+      Enviar para BigData
+    </a>
+  )
+}
+
 function ExpandedRow({ c }: { c: Cadastro }) {
+  const paiUrl = buildBigdataUrl({
+    nome: c.pai_nome,
+    sobrenome: c.pai_sobrenome,
+    telefone: c.pai_telefone,
+    email: c.pai_email,
+    data_nascimento: c.pai_data_nascimento,
+    cep: c.pai_cep ?? null,
+    bairro: c.pai_bairro,
+    cidade: c.pai_cidade,
+  })
+
+  const maeUrl = buildBigdataUrl({
+    nome: c.mae_nome,
+    sobrenome: c.mae_sobrenome,
+    telefone: c.mae_telefone,
+    email: c.mae_email,
+    data_nascimento: c.mae_data_nascimento,
+    cep: c.mae_cep ?? null,
+    bairro: c.mae_bairro,
+    cidade: c.mae_cidade,
+  })
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-blue-50/50 border-t border-blue-100">
       {/* Menor */}
@@ -71,14 +121,17 @@ function ExpandedRow({ c }: { c: Cadastro }) {
         {!c.tem_pai ? (
           <p className="text-sm text-amber-600 font-medium">Pai não informado</p>
         ) : (
-          <div className="flex flex-col gap-2 text-sm">
-            <Row label="Nome" value={`${c.pai_nome} ${c.pai_sobrenome}`} />
-            <Row label="Nascimento" value={formatDate(c.pai_data_nascimento)} />
-            <Row label="Telefone" value={c.pai_telefone} />
-            <Row label="E-mail" value={c.pai_email} />
-            <Row label="Bairro" value={c.pai_bairro} />
-            <Row label="Cidade" value={c.pai_cidade} />
-          </div>
+          <>
+            <div className="flex flex-col gap-2 text-sm">
+              <Row label="Nome" value={`${c.pai_nome} ${c.pai_sobrenome}`} />
+              <Row label="Nascimento" value={formatDate(c.pai_data_nascimento)} />
+              <Row label="Telefone" value={c.pai_telefone} />
+              <Row label="E-mail" value={c.pai_email} />
+              <Row label="Bairro" value={c.pai_bairro} />
+              <Row label="Cidade" value={c.pai_cidade} />
+            </div>
+            <BigdataButton url={paiUrl} />
+          </>
         )}
       </div>
 
@@ -88,14 +141,17 @@ function ExpandedRow({ c }: { c: Cadastro }) {
         {!c.tem_mae ? (
           <p className="text-sm text-amber-600 font-medium">Mãe não informada</p>
         ) : (
-          <div className="flex flex-col gap-2 text-sm">
-            <Row label="Nome" value={`${c.mae_nome} ${c.mae_sobrenome}`} />
-            <Row label="Nascimento" value={formatDate(c.mae_data_nascimento)} />
-            <Row label="Telefone" value={c.mae_telefone} />
-            <Row label="E-mail" value={c.mae_email} />
-            <Row label="Bairro" value={c.mae_bairro} />
-            <Row label="Cidade" value={c.mae_cidade} />
-          </div>
+          <>
+            <div className="flex flex-col gap-2 text-sm">
+              <Row label="Nome" value={`${c.mae_nome} ${c.mae_sobrenome}`} />
+              <Row label="Nascimento" value={formatDate(c.mae_data_nascimento)} />
+              <Row label="Telefone" value={c.mae_telefone} />
+              <Row label="E-mail" value={c.mae_email} />
+              <Row label="Bairro" value={c.mae_bairro} />
+              <Row label="Cidade" value={c.mae_cidade} />
+            </div>
+            <BigdataButton url={maeUrl} />
+          </>
         )}
       </div>
     </div>
