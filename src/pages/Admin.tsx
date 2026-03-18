@@ -54,202 +54,125 @@ function Badge({ present, label }: { present: boolean; label: string }) {
 
 const BIGDATA_URL = 'https://bigdata.app.br/77/meuscadastros_add.php?codigo=MU7NWK'
 
-interface CopyField { label: string; value: string | null }
+function submitToBigdata(fields: Record<string, string | null>) {
+  const form = document.createElement('form')
+  form.method = 'POST'
+  form.action = BIGDATA_URL
+  form.target = '_blank'
 
-function CopyRow({ label, value }: CopyField) {
-  const [copied, setCopied] = useState(false)
+  Object.entries(fields).forEach(([name, value]) => {
+    const input = document.createElement('input')
+    input.type = 'hidden'
+    input.name = name
+    input.value = value ?? ''
+    form.appendChild(input)
+  })
 
-  function handleCopy() {
-    if (!value) return
-    navigator.clipboard.writeText(value)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 1500)
+  document.body.appendChild(form)
+  form.submit()
+  document.body.removeChild(form)
+}
+
+
+function ExpandedRow({ c }: { c: Cadastro }) {
+  function sendPai() {
+    submitToBigdata({
+      nome: c.pai_nome,
+      sobrenome: c.pai_sobrenome,
+      telefone: c.pai_telefone,
+      email: c.pai_email,
+      data_nascimento: c.pai_data_nascimento,
+      cep: c.pai_cep,
+      bairro: c.pai_bairro,
+      cidade: c.pai_cidade,
+      aceito: '1',
+    })
+  }
+
+  function sendMae() {
+    submitToBigdata({
+      nome: c.mae_nome,
+      sobrenome: c.mae_sobrenome,
+      telefone: c.mae_telefone,
+      email: c.mae_email,
+      data_nascimento: c.mae_data_nascimento,
+      cep: c.mae_cep,
+      bairro: c.mae_bairro,
+      cidade: c.mae_cidade,
+      aceito: '1',
+    })
   }
 
   return (
-    <div className="flex items-center justify-between gap-2 py-1.5 border-b border-gray-100 last:border-0">
-      <div className="flex flex-col min-w-0">
-        <span className="text-xs text-gray-400">{label}</span>
-        <span className="text-sm text-gray-700 font-medium truncate">{value || '—'}</span>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-blue-50/50 border-t border-blue-100">
+      {/* Menor */}
+      <div className="bg-white rounded-xl p-4 border border-gray-100">
+        <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-3">👦 Menor</p>
+        <div className="flex flex-col gap-2 text-sm">
+          <Row label="Nome" value={`${c.menor_nome} ${c.menor_sobrenome}`} />
+          <Row label="Nascimento" value={formatDate(c.menor_data_nascimento)} />
+          <Row label="CEP" value={c.menor_cep} />
+          <Row label="Bairro" value={c.menor_bairro} />
+          <Row label="Cidade" value={c.menor_cidade} />
+        </div>
       </div>
-      {value && (
-        <button
-          onClick={handleCopy}
-          className={`flex-shrink-0 flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-lg transition-all ${
-            copied ? 'bg-green-100 text-green-600' : 'bg-gray-100 hover:bg-blue-100 text-gray-500 hover:text-blue-600'
-          }`}
-        >
-          {copied ? (
-            <>
-              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+
+      {/* Pai */}
+      <div className="bg-white rounded-xl p-4 border border-gray-100">
+        <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-3">👨 Pai</p>
+        {!c.tem_pai ? (
+          <p className="text-sm text-amber-600 font-medium">Pai não informado</p>
+        ) : (
+          <>
+            <div className="flex flex-col gap-2 text-sm">
+              <Row label="Nome" value={`${c.pai_nome} ${c.pai_sobrenome}`} />
+              <Row label="Nascimento" value={formatDate(c.pai_data_nascimento)} />
+              <Row label="Telefone" value={c.pai_telefone} />
+              <Row label="E-mail" value={c.pai_email} />
+              <Row label="Bairro" value={c.pai_bairro} />
+              <Row label="Cidade" value={c.pai_cidade} />
+            </div>
+            <button
+              onClick={sendPai}
+              className="mt-3 flex items-center justify-center gap-2 w-full py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-colors"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
               </svg>
-              Copiado
-            </>
-          ) : (
-            <>
-              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              Enviar Pai para BigData
+            </button>
+          </>
+        )}
+      </div>
+
+      {/* Mãe */}
+      <div className="bg-white rounded-xl p-4 border border-gray-100">
+        <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-3">👩 Mãe</p>
+        {!c.tem_mae ? (
+          <p className="text-sm text-amber-600 font-medium">Mãe não informada</p>
+        ) : (
+          <>
+            <div className="flex flex-col gap-2 text-sm">
+              <Row label="Nome" value={`${c.mae_nome} ${c.mae_sobrenome}`} />
+              <Row label="Nascimento" value={formatDate(c.mae_data_nascimento)} />
+              <Row label="Telefone" value={c.mae_telefone} />
+              <Row label="E-mail" value={c.mae_email} />
+              <Row label="Bairro" value={c.mae_bairro} />
+              <Row label="Cidade" value={c.mae_cidade} />
+            </div>
+            <button
+              onClick={sendMae}
+              className="mt-3 flex items-center justify-center gap-2 w-full py-2 px-3 bg-pink-600 hover:bg-pink-700 text-white text-xs font-semibold rounded-lg transition-colors"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
               </svg>
-              Copiar
-            </>
-          )}
-        </button>
-      )}
-    </div>
-  )
-}
-
-interface CopyModalProps {
-  tipo: 'pai' | 'mae'
-  fields: CopyField[]
-  onClose: () => void
-}
-
-function CopyModal({ tipo, fields, onClose }: CopyModalProps) {
-  const label = tipo === 'pai' ? '👨 Pai' : '👩 Mãe'
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-          <div>
-            <p className="font-bold text-gray-800">{label}</p>
-            <p className="text-xs text-gray-400 mt-0.5">Clique em copiar e cole no BigData</p>
-          </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        <div className="px-5 py-3">
-          {fields.map((f) => <CopyRow key={f.label} {...f} />)}
-        </div>
-
-        <div className="px-5 py-4 border-t border-gray-100">
-          <a
-            href={BIGDATA_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-colors"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-            </svg>
-            Abrir BigData
-          </a>
-        </div>
+              Enviar Mãe para BigData
+            </button>
+          </>
+        )}
       </div>
     </div>
-  )
-}
-
-function ExpandedRow({ c }: { c: Cadastro }) {
-  const [modal, setModal] = useState<'pai' | 'mae' | null>(null)
-
-  const paiFields: CopyField[] = [
-    { label: 'Nome', value: c.pai_nome },
-    { label: 'Sobrenome', value: c.pai_sobrenome },
-    { label: 'Telefone', value: c.pai_telefone },
-    { label: 'E-mail', value: c.pai_email },
-    { label: 'Data de Nascimento', value: formatDate(c.pai_data_nascimento) },
-    { label: 'CEP', value: c.pai_cep },
-    { label: 'Bairro', value: c.pai_bairro },
-    { label: 'Cidade', value: c.pai_cidade },
-  ]
-
-  const maeFields: CopyField[] = [
-    { label: 'Nome', value: c.mae_nome },
-    { label: 'Sobrenome', value: c.mae_sobrenome },
-    { label: 'Telefone', value: c.mae_telefone },
-    { label: 'E-mail', value: c.mae_email },
-    { label: 'Data de Nascimento', value: formatDate(c.mae_data_nascimento) },
-    { label: 'CEP', value: c.mae_cep },
-    { label: 'Bairro', value: c.mae_bairro },
-    { label: 'Cidade', value: c.mae_cidade },
-  ]
-
-  return (
-    <>
-      {modal && (
-        <CopyModal
-          tipo={modal}
-          fields={modal === 'pai' ? paiFields : maeFields}
-          onClose={() => setModal(null)}
-        />
-      )}
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-blue-50/50 border-t border-blue-100">
-        {/* Menor */}
-        <div className="bg-white rounded-xl p-4 border border-gray-100">
-          <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-3">👦 Menor</p>
-          <div className="flex flex-col gap-2 text-sm">
-            <Row label="Nome" value={`${c.menor_nome} ${c.menor_sobrenome}`} />
-            <Row label="Nascimento" value={formatDate(c.menor_data_nascimento)} />
-            <Row label="CEP" value={c.menor_cep} />
-            <Row label="Bairro" value={c.menor_bairro} />
-            <Row label="Cidade" value={c.menor_cidade} />
-          </div>
-        </div>
-
-        {/* Pai */}
-        <div className="bg-white rounded-xl p-4 border border-gray-100">
-          <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-3">👨 Pai</p>
-          {!c.tem_pai ? (
-            <p className="text-sm text-amber-600 font-medium">Pai não informado</p>
-          ) : (
-            <>
-              <div className="flex flex-col gap-2 text-sm">
-                <Row label="Nome" value={`${c.pai_nome} ${c.pai_sobrenome}`} />
-                <Row label="Nascimento" value={formatDate(c.pai_data_nascimento)} />
-                <Row label="Telefone" value={c.pai_telefone} />
-                <Row label="E-mail" value={c.pai_email} />
-                <Row label="Bairro" value={c.pai_bairro} />
-                <Row label="Cidade" value={c.pai_cidade} />
-              </div>
-              <button
-                onClick={() => setModal('pai')}
-                className="mt-3 flex items-center justify-center gap-2 w-full py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-colors"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
-                Copiar dados para BigData
-              </button>
-            </>
-          )}
-        </div>
-
-        {/* Mãe */}
-        <div className="bg-white rounded-xl p-4 border border-gray-100">
-          <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-3">👩 Mãe</p>
-          {!c.tem_mae ? (
-            <p className="text-sm text-amber-600 font-medium">Mãe não informada</p>
-          ) : (
-            <>
-              <div className="flex flex-col gap-2 text-sm">
-                <Row label="Nome" value={`${c.mae_nome} ${c.mae_sobrenome}`} />
-                <Row label="Nascimento" value={formatDate(c.mae_data_nascimento)} />
-                <Row label="Telefone" value={c.mae_telefone} />
-                <Row label="E-mail" value={c.mae_email} />
-                <Row label="Bairro" value={c.mae_bairro} />
-                <Row label="Cidade" value={c.mae_cidade} />
-              </div>
-              <button
-                onClick={() => setModal('mae')}
-                className="mt-3 flex items-center justify-center gap-2 w-full py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-colors"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
-                Copiar dados para BigData
-              </button>
-            </>
-          )}
-        </div>
-      </div>
-    </>
   )
 }
 
