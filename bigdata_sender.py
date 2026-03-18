@@ -94,10 +94,20 @@ def escolher_responsavel(cadastro: dict) -> dict | None:
                 return None
             if 1 <= escolha <= len(opcoes):
                 prefixo = opcoes[escolha - 1][0]
+                nome_completo = cadastro.get(f"{prefixo}_nome") or ""
+                partes = nome_completo.strip().split(" ", 1)
+                primeiro_nome = partes[0]
+                sobrenome_db  = cadastro.get(f"{prefixo}_sobrenome") or ""
+                # Se o sobrenome do banco estiver vazio, usa o resto do nome completo
+                sobrenome_final = sobrenome_db if sobrenome_db else (partes[1] if len(partes) > 1 else "")
+
+                telefone_raw = cadastro.get(f"{prefixo}_telefone") or ""
+                telefone_digits = "".join(c for c in telefone_raw if c.isdigit())
+
                 return {
-                    "nome":             cadastro.get(f"{prefixo}_nome") or "",
-                    "sobrenome":        cadastro.get(f"{prefixo}_sobrenome") or "",
-                    "telefone":         cadastro.get(f"{prefixo}_telefone") or "",
+                    "nome":             primeiro_nome,
+                    "sobrenome":        sobrenome_final,
+                    "telefone":         telefone_digits,
                     "email":            cadastro.get(f"{prefixo}_email") or "",
                     "data_nascimento":  formatar_data(cadastro.get(f"{prefixo}_data_nascimento")),
                     "cep":              (cadastro.get(f"{prefixo}_cep") or "").replace("-", ""),
@@ -133,9 +143,18 @@ def enviar_para_bigdata(dados: dict):
         page.goto(BIGDATA_URL, wait_until="networkidle")
 
         print("  Preenchendo campos...")
+        preencher_campo(page, "Quem te indicou", "William da Rocha")
         preencher_campo(page, "Nome", dados["nome"])
         preencher_campo(page, "Sobrenome", dados["sobrenome"])
-        preencher_campo(page, "Telefone", dados["telefone"])
+
+        # Telefone: digita dígito a dígito para respeitar a máscara do site
+        try:
+            campo_tel = page.get_by_label("Telefone", exact=False).first
+            campo_tel.click()
+            campo_tel.press_sequentially(dados["telefone"], delay=80)
+        except Exception:
+            preencher_campo(page, "Telefone", dados["telefone"])
+
         preencher_campo(page, "E-mail", dados["email"])
         preencher_campo(page, "Data de Nascimento", dados["data_nascimento"])
         preencher_campo(page, "CEP", dados["cep"])
