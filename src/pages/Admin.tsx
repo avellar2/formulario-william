@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { signOut } from '../lib/auth'
+import { exportToExcel } from '../lib/exportExcel'
 
 interface Cadastro {
   id: string
@@ -250,6 +251,15 @@ export default function Admin() {
             </div>
           </div>
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => exportToExcel(cadastros)}
+              className="flex items-center gap-2 text-sm text-gray-500 hover:text-green-600 transition-colors font-medium"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Exportar Excel
+            </button>
             <button
               onClick={handleExportJson}
               className="flex items-center gap-2 text-sm text-gray-500 hover:text-blue-600 transition-colors font-medium"
