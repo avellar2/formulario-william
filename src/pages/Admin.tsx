@@ -31,6 +31,8 @@ interface Cadastro {
   mae_cep: string | null
   mae_bairro: string | null
   mae_cidade: string | null
+  pai_enviado_bigdata: boolean
+  mae_enviado_bigdata: boolean
 }
 
 function formatDate(date: string | null): string {
@@ -53,7 +55,7 @@ function Badge({ present, label }: { present: boolean; label: string }) {
   )
 }
 
-const BIGDATA_URL = 'https://bigdata.app.br/77/meuscadastros_add.php?codigo=MU7NWK'
+const BIGDATA_URL = 'https://bigdata.app.br/77/meuscadastros_add.php?codigo=MU7NWKAJ'
 
 function submitToBigdata(fields: Record<string, string | null>) {
   const form = document.createElement('form')
@@ -133,15 +135,26 @@ function ExpandedRow({ c }: { c: Cadastro }) {
               <Row label="Bairro" value={c.pai_bairro} />
               <Row label="Cidade" value={c.pai_cidade} />
             </div>
-            <button
-              onClick={sendPai}
-              className="mt-3 flex items-center justify-center gap-2 w-full py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-colors"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-              </svg>
-              Enviar Pai para BigData
-            </button>
+            <div className="flex items-center gap-2 mt-3">
+              {c.pai_enviado_bigdata ? (
+                <span className="flex items-center gap-1.5 text-xs font-semibold text-green-700 bg-green-100 px-3 py-2 rounded-lg w-full justify-center">
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Pai enviado para BigData
+                </span>
+              ) : (
+                <button
+                  onClick={sendPai}
+                  className="flex items-center justify-center gap-2 w-full py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-colors"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  </svg>
+                  Enviar Pai para BigData
+                </button>
+              )}
+            </div>
           </>
         )}
       </div>
@@ -161,15 +174,26 @@ function ExpandedRow({ c }: { c: Cadastro }) {
               <Row label="Bairro" value={c.mae_bairro} />
               <Row label="Cidade" value={c.mae_cidade} />
             </div>
-            <button
-              onClick={sendMae}
-              className="mt-3 flex items-center justify-center gap-2 w-full py-2 px-3 bg-pink-600 hover:bg-pink-700 text-white text-xs font-semibold rounded-lg transition-colors"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-              </svg>
-              Enviar Mãe para BigData
-            </button>
+            <div className="flex items-center gap-2 mt-3">
+              {c.mae_enviado_bigdata ? (
+                <span className="flex items-center gap-1.5 text-xs font-semibold text-green-700 bg-green-100 px-3 py-2 rounded-lg w-full justify-center">
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Mãe enviada para BigData
+                </span>
+              ) : (
+                <button
+                  onClick={sendMae}
+                  className="flex items-center justify-center gap-2 w-full py-2 px-3 bg-pink-600 hover:bg-pink-700 text-white text-xs font-semibold rounded-lg transition-colors"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  </svg>
+                  Enviar Mãe para BigData
+                </button>
+              )}
+            </div>
           </>
         )}
       </div>
@@ -333,7 +357,13 @@ export default function Admin() {
                       </span>
                       <span className="text-sm text-gray-500">{c.menor_cidade}</span>
                       <Badge present={c.tem_pai} label={c.tem_pai ? 'Com pai' : 'Sem pai'} />
+                      {c.pai_enviado_bigdata && (
+                        <span className="text-[10px] font-semibold text-green-600 bg-green-50 px-1.5 py-0.5 rounded-full">BigData ✔</span>
+                      )}
                       <Badge present={c.tem_mae} label={c.tem_mae ? 'Com mãe' : 'Sem mãe'} />
+                      {c.mae_enviado_bigdata && (
+                        <span className="text-[10px] font-semibold text-green-600 bg-green-50 px-1.5 py-0.5 rounded-full">BigData ✔</span>
+                      )}
                       <span className="text-xs text-gray-400 whitespace-nowrap">{formatDateTime(c.created_at)}</span>
                     </div>
 
@@ -345,6 +375,8 @@ export default function Admin() {
                         <div className="flex gap-1.5 mt-2">
                           <Badge present={c.tem_pai} label={c.tem_pai ? 'Com pai' : 'Sem pai'} />
                           <Badge present={c.tem_mae} label={c.tem_mae ? 'Com mãe' : 'Sem mãe'} />
+                          {c.pai_enviado_bigdata && <span className="text-[10px] font-semibold text-green-600">Pai ✔</span>}
+                          {c.mae_enviado_bigdata && <span className="text-[10px] font-semibold text-green-600">Mãe ✔</span>}
                         </div>
                       </div>
                       <svg
