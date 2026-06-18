@@ -1,6 +1,5 @@
 interface Step {
   label: string
-  icon: string
 }
 
 interface StepperProps {
@@ -10,16 +9,16 @@ interface StepperProps {
 
 export function Stepper({ steps, current }: StepperProps) {
   return (
-    <div className="flex items-center justify-center mb-8 px-4">
+    <div className="flex items-center justify-center">
       {steps.map((step, index) => (
         <div key={index} className="flex items-center">
           <div className="flex flex-col items-center">
             <div
               className={`
-                w-12 h-12 rounded-full flex items-center justify-center text-xl font-semibold transition-all duration-300
-                ${index < current ? 'bg-blue-500 text-white shadow-lg shadow-blue-200' : ''}
-                ${index === current ? 'bg-blue-600 text-white shadow-lg shadow-blue-300 scale-110' : ''}
-                ${index > current ? 'bg-white text-gray-400 border-2 border-gray-200' : ''}
+                w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300
+                ${index < current ? 'bg-orange-500 text-white' : ''}
+                ${index === current ? 'bg-gray-900 text-white ring-4 ring-gray-100' : ''}
+                ${index > current ? 'bg-gray-100 text-gray-400' : ''}
               `}
             >
               {index < current ? (
@@ -27,12 +26,12 @@ export function Stepper({ steps, current }: StepperProps) {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                 </svg>
               ) : (
-                <span>{step.icon}</span>
+                index + 1
               )}
             </div>
             <span
-              className={`mt-2 text-xs font-medium transition-colors duration-300 text-center max-w-16
-                ${index === current ? 'text-blue-600' : index < current ? 'text-blue-400' : 'text-gray-400'}
+              className={`mt-2 text-xs font-medium transition-colors duration-300
+                ${index === current ? 'text-gray-900' : index < current ? 'text-orange-600' : 'text-gray-400'}
               `}
             >
               {step.label}
@@ -40,8 +39,8 @@ export function Stepper({ steps, current }: StepperProps) {
           </div>
           {index < steps.length - 1 && (
             <div
-              className={`w-16 sm:w-24 h-0.5 mx-2 mb-5 transition-all duration-500
-                ${index < current ? 'bg-blue-400' : 'bg-gray-200'}
+              className={`w-16 sm:w-24 h-px mx-3 mb-6 transition-all duration-300
+                ${index < current ? 'bg-orange-500' : 'bg-gray-200'}
               `}
             />
           )}

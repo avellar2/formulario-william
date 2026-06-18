@@ -44,18 +44,18 @@ export function StepMenor({ defaultValues, onNext }: StepMenorProps) {
 
   return (
     <form onSubmit={handleSubmit(onNext)} className="flex flex-col gap-5">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <FormField
           label="Nome"
           required
-          placeholder="Nome do menor"
+          placeholder="Nome da criança"
           error={errors.nome?.message}
           {...register('nome')}
         />
         <FormField
           label="Sobrenome"
           required
-          placeholder="Sobrenome do menor"
+          placeholder="Sobrenome"
           error={errors.sobrenome?.message}
           {...register('sobrenome')}
         />
@@ -87,7 +87,7 @@ export function StepMenor({ defaultValues, onNext }: StepMenorProps) {
         onBlur={(e) => handleCepBlur(e.target.value)}
       />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <FormField
           label="Bairro"
           required
@@ -106,12 +106,9 @@ export function StepMenor({ defaultValues, onNext }: StepMenorProps) {
 
       <button
         type="submit"
-        className="mt-2 w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold py-3.5 rounded-xl transition-all duration-200 shadow-md shadow-blue-200 flex items-center justify-center gap-2"
+        className="mt-4 w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-3.5 rounded-lg transition-all duration-200 hover:shadow-lg hover:shadow-gray-200"
       >
-        Próximo
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-        </svg>
+        Continuar
       </button>
     </form>
   )
